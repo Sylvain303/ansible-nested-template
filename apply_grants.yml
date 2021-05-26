@@ -1,0 +1,20 @@
+---
+# vim: set et ts=2 sts=2 sw=2:
+- hosts: localhost
+  gather_facts: False
+
+  vars:
+    vault_secure:
+      passwords:
+        alice: "alice_s3cur3_p4sw0rd"
+        bob: "Street4Fair8author"
+        service_account: "stay7leap&solo"
+    sql_users_grants: /tmp/output.sql
+
+  tasks:
+    - name: apply generated SQL script
+      template:
+        src: "{{sql_users_grants}}"
+        dest: "{{sql_users_grants | replace('.sql', '_with_password.sql') }}"
+        variable_start_string: "[%"
+        variable_end_string: "%]"

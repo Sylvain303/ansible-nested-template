@@ -14,6 +14,7 @@
         role: db_owner
       - name: alice
         role: dbmanager
+    generated_grants: /tmp/output.sql
 
   tasks:
     - name: play extra template if special_sql is requested
@@ -25,7 +26,7 @@
         username: "{{ special_sql.username}}"
         # embbeded jinja will be resolved at deploy time
         # vault_secure is not defined
-        password: "{{ '{{' }}vault_secure.passwords[\"{{username}}\"]{{ '}}' }}"
+        password: "[% vault_secure.passwords[\"{{username}}\"] %]"
       when: >
         special_sql is defined
         and special_sql.type == 'template'
@@ -36,4 +37,4 @@
     - name: generate template
       template:
         src: templates/sql_users_grants.sql.j2
-        dest: /tmp/output.txt
+        dest: "{{generated_grants}}"
