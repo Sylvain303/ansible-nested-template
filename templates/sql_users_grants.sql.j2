@@ -1,0 +1,28 @@
+-- vim: set ft=sql:
+-- SQL grants for api users
+--
+--  #####################################################################
+--  
+--  
+--  
+--     file managed by ansible, DO NOT EDIT!
+--  
+--  
+--  
+--  #####################################################################
+{% for u in user_list %}
+IF NOT EXISTS(SELECT * FROM sys.database_principals WHERE name = '{{u.name}}')
+BEGIN
+  CREATE USER [{{u.name}}]
+    FOR LOGIN [{{u.name}}]
+    WITH DEFAULT_SCHEMA = dbo
+  ;
+END
+
+{% endfor %}
+{# -- ====================================== handle special_sql_output ============================================= #}
+{% if special_sql_output is defined and special_sql_output | length > 0 %}
+{{ special_sql_output }}
+
+{% endif %}
+{# -- ============================================================================================================== #}

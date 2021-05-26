@@ -1,0 +1,39 @@
+---
+# vim: set et ts=2 sts=2 sw=2:
+- hosts: localhost
+  gather_facts: False
+
+  vars:
+    special_sql:
+      template: templates/database_scoped_credential.sql.j2
+      type: template
+      username: service_account
+      credential_name: OurElasticQueryCred
+    user_list:
+      - name: bob
+        role: db_owner
+      - name: alice
+        role: dbmanager
+
+  tasks:
+    - name: play extra template if special_sql is requested
+      set_fact:
+        special_sql_output: "{{ lookup('template', template_name) }}"
+      vars:
+        credential_name: "{{ special_sql.credential_name}}"
+        template_name: "{{ special_sql.template}}"
+        username: "{{ special_sql.username}}"
+        # embbeded jinja will be resolved at deploy time
+        # vault_secure is not defined
+        password: "{{ '{{' }}vault_secure.passwords[\"{{username}}\"]{{ '}}' }}"
+      when: >
+        special_sql is defined
+        and special_sql.type == 'template'
+
+    - debug:
+        var: special_sql_output
+
+    - name: generate template
+      template:
+        src: templates/sql_users_grants.sql.j2
+        dest: /tmp/output.txt
