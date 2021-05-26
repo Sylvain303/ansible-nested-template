@@ -33,17 +33,21 @@ if `special_sql_output` is define we would like to embed it **verbatim**.
 
 As it can contains password that will be resolve during deploy process.
 
-## tested
+## tested without succes
 
 `!unsafe` fact attribute
-`| e` `| safe` jinja filter
+
+`| e` or `| safe` jinja filter
+
+copy still recurse eval !
 ```yaml
 - name:
   copy:
     content: "{{special_sql_output}}"
     dest: /tmp/partial_include.txt
 ```
-`{% include '/tmp/partial_include.txt' %}
+
+`{% include '/tmp/partial_include.txt' %}` inside jinaj template but is outside
 
 
 ## run
